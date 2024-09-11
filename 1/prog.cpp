@@ -44,7 +44,6 @@ int cities_input(std::vector<std::string>* vec, std::vector<std::string>& base) 
 bool city_name_check(std::string& city, std::vector<std::string>& base) {
     if (find(base.begin(), base.end(), city) == base.end())
         return false;
-        //throw std::logic_error(PROMPT_004);
     for (char c : city)
         if ((int)c < 45 || (int)c > 45 && (int)c < 65 || (int)c > 90 && (int)c < 97 || (int)c > 122)
             throw std::logic_error(PROMPT_005);
