@@ -106,17 +106,17 @@ bool is_in_array(const char** arr, const int length, const char* str) {
 // определение последней буквы
 char last_letter(const std::string& city) {
     const std::string forbidden = "hjqwx\0";
-    for (unsigned __int64 i = city.size() - 1; i != 0; --i) {
-        if (find(forbidden.begin(), forbidden.end(), city[(const unsigned __int64)i]) == forbidden.end())
-            return city[(const unsigned __int64)i];
-    }
+    for (unsigned __int64 i = city.size() - 1; i != 0; --i)
+        if (forbidden.find(city[i]) == std::string::npos)
+        //if (find(forbidden.begin(), forbidden.end(), city[(const unsigned __int64)i]) == forbidden.end())
+            return city[i];
     return '\0';
 }
 
 char last_letter(const char* city) {
     const std::string forbidden = "hjqwx\0";
     for (int i = (int)strlen(city) - 1; i >= 0; --i)
-        if (find(forbidden.begin(), forbidden.end(), city[(const unsigned __int64)i]) == forbidden.end())
-            return city[(const unsigned __int64)i];
+        if (forbidden.find(city[i]) == std::string::npos)
+            return city[i];
     return '\0';
 }
