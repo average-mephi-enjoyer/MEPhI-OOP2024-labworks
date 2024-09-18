@@ -94,7 +94,7 @@ const char* answer(const char** used, int *length, const std::vector<std::string
     throw std::runtime_error(PROMPT_NO_ANSWER);
 }
 
-// find в const char ** 
+// find для const char ** 
 bool is_in_array(const char** arr, const int length, const char* str) {
     for (int i = 0; i < length; ++i)
         if (strcmp(arr[i], str) == 0)
