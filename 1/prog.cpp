@@ -94,7 +94,7 @@ const char* answer(const char** used, int *length, const std::vector<std::string
     throw std::runtime_error(PROMPT_NO_ANSWER);
 }
 
-// проверка наличия строки в массиве const char **
+// find в const char ** 
 bool is_in_array(const char** arr, const int length, const char* str) {
     for (int i = 0; i < length; ++i)
         if (strcmp(arr[i], str) == 0)
@@ -108,7 +108,6 @@ char last_letter(const std::string& city) {
     const std::string forbidden = "hjqwx\0";
     for (unsigned __int64 i = city.size() - 1; i != 0; --i)
         if (forbidden.find(city[i]) == std::string::npos)
-        //if (find(forbidden.begin(), forbidden.end(), city[(const unsigned __int64)i]) == forbidden.end())
             return city[i];
     return '\0';
 }
