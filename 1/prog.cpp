@@ -10,96 +10,113 @@
 #include "prompts.h"
 
 // загрузка общего списка городов из файла
-int base_setup(std::vector<std::string>& base) {
-    std::ifstream in("C:\\Users\\artem\\source\\repos\\b23516_iashchenko.ai\\1\\base.txt");
+std::vector<std::string> base_setup(int* arr_capacity) {
+    std::ifstream in("base.txt");
+    std::vector<std::string> base;
     std::string city;
-    while (getline(in, city))
+    while (getline(in, city)) {
+        (*arr_capacity)++;
         base.push_back(city);
+    }
     in.close();
-    return 0;
+    return base;
 }
 
-// ввод использованных городов
-int cities_input(std::vector<std::string>* vec, std::vector<std::string>& base) {
-    try {
-        while (1) {
-            std::cout << PROMPT_002;
-            std::string temp = string_read();
-            if (!city_name_check(temp, base))
-                std::cout << PROMPT_004 << std::endl;
-            else {
-                (*vec).push_back(temp);
-                base.erase(find(base.begin(), base.end(), temp));
-            }
-        }
+// ввод использованного города
+bool city_in(std::vector<std::string>& vec, const std::vector<std::string>& base) {
+    std::string city;
+    std::cout << PROMPT_CITY_INPUT;
+    city = string_read();
+    if (city_name_check(city, vec, base)) {
+        vec.push_back(city);
+        return true;
     }
-    catch (std::runtime_error) {
-        std::cout << PROMPT_003 << std::endl;
-        return 1;
+    else {
+        std::cout << PROMPT_ERR_INPUT << std::endl;
+        return false;
     }
-    return 0;
+}
+
+bool city_in(const char **used, int *length, const std::vector<std::string>& base) {
+    std::cout << PROMPT_CITY_INPUT;
+    std::string temp = string_read();
+    if (city_name_check(temp, used, *length, base)) {
+        used[*length] = new char[temp.size() + 1];
+        strcpy_s((char*)used[*length], (rsize_t)temp.size() + 1, temp.c_str());
+        (*length) ++;
+        return true;
+    }
+    else {
+        std::cout << PROMPT_ERR_INPUT << std::endl;
+        return false;
+    }
 }
 
 // проверка правильности названия города
-bool city_name_check(std::string& city, std::vector<std::string>& base) {
-    if (find(base.begin(), base.end(), city) == base.end())
-        return false;
-    for (char c : city)
-        if ((int)c < 45 || (int)c > 45 && (int)c < 65 || (int)c > 90 && (int)c < 97 || (int)c > 122)
-            throw std::logic_error(PROMPT_005);
-    return true;
+bool city_name_check(const std::string& city, const char** used, const int length, const std::vector<std::string>& base) {
+    const std::string alph = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ";
+    return std::find(base.begin(), base.end(), city) != base.end()
+        && std::all_of(city.begin(), city.end(), [&alph](char ch) {return std::find(alph.begin(), alph.end(), ch) != alph.end(); })
+        && !is_in_array(used, length, city.c_str()) && (length == 0 ? 1 : city[0] == toupper(last_letter(used[length - 1])));
 }
 
-// основа
-int process(int& overload_choice, std::vector<std::string>& in_cities, std::vector<std::string>& base) {
-    if (in_cities.size() == 0)
-        throw std::runtime_error(PROMPT_006);
-    if (overload_choice == 2)
-        std::cout << get_answer(toupper(last_letter(in_cities.back())), base) << std::endl;
-    else {
-        char** arr = new char* [318];
-        for (int i = 0; i < in_cities.size(); ++i) {
-            arr[i] = new char[in_cities[i].size() + 1];
-            strcpy_s(arr[i], (rsize_t)(in_cities[i].size() + 1), in_cities[i].c_str());
-        }
-        std::cout << get_answer(toupper(last_letter(in_cities[in_cities.size() - 1])), in_cities.size(), base) << std::endl;
-        for (int i = 0; i < in_cities.size(); ++i)
-            delete[] arr[i];
-        delete[] arr;
+bool city_name_check(const std::string& city, const std::vector<std::string>& vec, const std::vector<std::string>& base) {
+    const std::string alph = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ";
+    return std::find(base.begin(), base.end(), city) != base.end()
+        && std::find(vec.begin(), vec.end(), city) == vec.end() && (vec.empty() ? 1 : city[0] == toupper(last_letter(vec.back())))
+        && std::all_of(city.begin(), city.end(), [&alph](char ch) {return std::find(alph.begin(), alph.end(), ch) != alph.end(); });
+}
+
+// основa
+std::string answer(std::vector<std::string>& used, const std::vector<std::string>& base) {
+    if (used.size() == 0)
+        throw std::runtime_error(PROMPT_EMPTY_LIST);
+    auto result = std::find_if(base.begin(), base.end(), [&used](std::string city)
+        {return (find(used.begin(), used.end(), city) == used.end() && toupper(last_letter(used.back())) == city[0]); });
+    if (result != base.end()) {
+        used.push_back(base[(const unsigned __int64)(result - base.begin())]);
+        return base[(const unsigned __int64)(result - base.begin())];
     }
-    return 0;
+    throw std::runtime_error(PROMPT_NO_ANSWER);
 }
 
-// нахождение ответа
-std::string get_answer(char ch, std::vector<std::string>& base) {
-    for (int i = 0; i < base.size(); ++i)
-        if (base[i][0] == ch)
-            return base[i];
-    throw std::runtime_error(PROMPT_007);
+const char* answer(const char** used, int *length, const std::vector<std::string>& base) {
+    if (length == 0)
+        throw std::runtime_error(PROMPT_EMPTY_LIST);
+    for (std::string city : base) {
+        if (!is_in_array(used, *length, city.c_str()) && city[0] == toupper(last_letter(used[*length - 1]))) {
+            used[*length] = new char[city.size() + 1];
+            strcpy_s((char*)used[*length], (rsize_t)city.size() + 1, city.c_str());
+            (*length)++;
+            return used[*length - 1];
+        }
+    }
+    throw std::runtime_error(PROMPT_NO_ANSWER);
 }
 
-const char* get_answer(char ch, int length, std::vector<std::string>& base) {
-    for (int i = 0; i < base.size(); ++i)
-        if (base[i][0] == ch)
-            return base[i].c_str();
-    throw std::runtime_error(PROMPT_007);
+// проверка наличия строки в массиве const char **
+bool is_in_array(const char** arr, const int length, const char* str) {
+    for (int i = 0; i < length; ++i)
+        if (strcmp(arr[i], str) == 0)
+            return true;
+    return false;
+
 }
 
 // определение последней буквы
-char last_letter(std::string& city) {
-    std::string forbidden = "hjqwx\0";
-    for (int i = city.size() - 1; i >= 0; --i) {
-        if (find(forbidden.begin(), forbidden.end(), city[i]) == forbidden.end())
-            return city[i];
+char last_letter(const std::string& city) {
+    const std::string forbidden = "hjqwx\0";
+    for (unsigned __int64 i = city.size() - 1; i != 0; --i) {
+        if (find(forbidden.begin(), forbidden.end(), city[(const unsigned __int64)i]) == forbidden.end())
+            return city[(const unsigned __int64)i];
     }
     return '\0';
 }
 
 char last_letter(const char* city) {
-    std::string forbidden = "hjqwx\0";
-    std::cout << city << std::endl;
-    for (int i = strlen(city) - 1; i >= 0; --i)
-        if (find(forbidden.begin(), forbidden.end(), city[i]) == forbidden.end())
-            return city[i];
+    const std::string forbidden = "hjqwx\0";
+    for (int i = (int)strlen(city) - 1; i >= 0; --i)
+        if (find(forbidden.begin(), forbidden.end(), city[(const unsigned __int64)i]) == forbidden.end())
+            return city[(const unsigned __int64)i];
     return '\0';
 }

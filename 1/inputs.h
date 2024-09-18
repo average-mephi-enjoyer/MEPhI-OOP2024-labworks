@@ -5,9 +5,9 @@
 #include <limits>
 
 #define PROMPT_OUT_OF_RANGE "Input ERROR! This value is out of range!\n"
-#define PROMPT_EOF "EOF at the end of input.\n"
+#define PROMPT_EOF "Input closed. EOF at the end of input.\n"
 #define PROMPT_BAD "Input fatal ERROR. cin.bad()\n"
-#define PROMPT_FAIL "Input fail! Please, try again.\n>> "
+#define PROMPT_FAIL "Input FAIL! Please, try again.\n>> "
 
 template <typename T>
 bool try_read(T& variable);

@@ -1,2 +1,5 @@
 .vs/
 *.json
+*.md
+1/build
+1/tests
