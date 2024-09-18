@@ -37,13 +37,13 @@ bool city_in(std::vector<std::string>& vec, const std::vector<std::string>& base
     }
 }
 
-bool city_in(const char **used, int *length, const std::vector<std::string>& base) {
+bool city_in(const char **used, int &length, const std::vector<std::string>& base) {
     std::cout << PROMPT_CITY_INPUT;
     std::string temp = string_read();
-    if (city_name_check(temp, used, *length, base)) {
-        used[*length] = new char[temp.size() + 1];
-        strcpy_s((char*)used[*length], (rsize_t)temp.size() + 1, temp.c_str());
-        (*length) ++;
+    if (city_name_check(temp, used, length, base)) {
+        used[length] = new char[temp.size() + 1];
+        strncpy((char*)used[length], temp.c_str(), temp.size() + 1);
+        length++;
         return true;
     }
     else {
@@ -57,7 +57,8 @@ bool city_name_check(const std::string& city, const char** used, const int lengt
     const std::string alph = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ";
     return std::find(base.begin(), base.end(), city) != base.end()
         && std::all_of(city.begin(), city.end(), [&alph](char ch) {return std::find(alph.begin(), alph.end(), ch) != alph.end(); })
-        && !is_in_array(used, length, city.c_str()) && (length == 0 ? 1 : city[0] == toupper(last_letter(used[length - 1])));
+        && !is_in_array(used, length, city.c_str()) 
+        && (length == 0 ? 1 : city[0] == toupper(last_letter(used[length - 1])));
 }
 
 bool city_name_check(const std::string& city, const std::vector<std::string>& vec, const std::vector<std::string>& base) {
@@ -74,21 +75,21 @@ std::string answer(std::vector<std::string>& used, const std::vector<std::string
     auto result = std::find_if(base.begin(), base.end(), [&used](std::string city)
         {return (find(used.begin(), used.end(), city) == used.end() && toupper(last_letter(used.back())) == city[0]); });
     if (result != base.end()) {
-        used.push_back(base[(const unsigned __int64)(result - base.begin())]);
-        return base[(const unsigned __int64)(result - base.begin())];
+        used.push_back(base[result - base.begin()]);
+        return base[result - base.begin()];
     }
     throw std::runtime_error(PROMPT_NO_ANSWER);
 }
 
-const char* answer(const char** used, int *length, const std::vector<std::string>& base) {
+const char* answer(const char** used, int &length, const std::vector<std::string>& base) {
     if (length == 0)
         throw std::runtime_error(PROMPT_EMPTY_LIST);
     for (std::string city : base) {
-        if (!is_in_array(used, *length, city.c_str()) && city[0] == toupper(last_letter(used[*length - 1]))) {
-            used[*length] = new char[city.size() + 1];
-            strcpy_s((char*)used[*length], (rsize_t)city.size() + 1, city.c_str());
-            (*length)++;
-            return used[*length - 1];
+        if (!is_in_array(used, length, city.c_str()) && city[0] == toupper(last_letter(used[length - 1]))) {
+            used[length] = new char[city.size() + 1];
+            strcpy_s((char*)used[length], (rsize_t)city.size() + 1, city.c_str());
+            length++;
+            return used[length - 1];
         }
     }
     throw std::runtime_error(PROMPT_NO_ANSWER);
@@ -105,16 +106,16 @@ bool is_in_array(const char** arr, const int length, const char* str) {
 
 // определение последней буквы
 char last_letter(const std::string& city) {
-    const std::string forbidden = "hjqwx\0";
-    for (unsigned __int64 i = city.size() - 1; i != 0; --i)
-        if (forbidden.find(city[i]) == std::string::npos)
-            return city[i];
-    return '\0';
+    return last_letter(city.c_str());
 }
 
 char last_letter(const char* city) {
     const std::string forbidden = "hjqwx\0";
-    for (int i = (int)strlen(city) - 1; i >= 0; --i)
+    //std::string_view sv(city);
+    //size_t last = sv.find_last_not_of(forbidden);
+    //return last != sv.npos ? city[last] : '\0';
+
+    for (size_t i = strlen(city) - 1; i >= 0; --i)
         if (forbidden.find(city[i]) == std::string::npos)
             return city[i];
     return '\0';
