@@ -5,6 +5,7 @@
 This file contains definitions of prototypes of input functions for various data,
 as well as dialog messages used by these functions.
 */
+
 #ifndef INPUTS_H
 #define INPUTS_H
 #include <cstring>
