@@ -5,7 +5,3 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fsanitize=address")
 add_library(prog prog.h prog.cpp inputs.h inputs.cpp prompts.h)
 link_libraries(prog)
 add_executable(main main.cpp)
-# mkdir build # создание директории для файлов сборки
-# cd build # переход в директорию сборки
-# cmake .. # генерация файлов сборки на основе CMakeLists.txt
-# make # сборка проекта
