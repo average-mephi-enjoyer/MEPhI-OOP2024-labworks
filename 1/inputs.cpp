@@ -15,7 +15,6 @@ bool try_read(T& variable) {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::cout << PROMPT_FAIL;
         return false;
-        //throw std::runtime_error(PROMPT_FAIL);
     }
     return true;
 }

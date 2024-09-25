@@ -11,8 +11,8 @@ int main() {
     const char** used_arr = nullptr;
     int overload_choice, length = 0, arr_capacity = 0;
     try {
-        std::vector<std::string> used_vec, base = base_setup(&arr_capacity);
-        used_arr = new const char* [(size_t)arr_capacity];
+        std::vector<std::string> used_vec, base = base_setup();
+        used_arr = new const char* [base.size()];
         overload_choice = int_read(1, 2);
         std::cout << PROMPT_GAME_BEGIN << std::endl;
         if (overload_choice == 1) {

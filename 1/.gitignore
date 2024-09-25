@@ -1,5 +1,6 @@
 *.json
 *.pdb
+*.pdf
 *.obj
 *.exe
 .vs/

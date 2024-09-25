@@ -9,20 +9,16 @@
 #include "inputs.h"
 #include "prompts.h"
 
-// загрузка общего списка городов из файла
-std::vector<std::string> base_setup(int* arr_capacity) {
+std::vector<std::string> base_setup() {
     std::ifstream in("base.txt");
     std::vector<std::string> base;
     std::string city;
-    while (getline(in, city)) {
-        (*arr_capacity)++;
+    while (getline(in, city))
         base.push_back(city);
-    }
     in.close();
     return base;
 }
 
-// ввод использованного города
 bool city_in(std::vector<std::string>& vec, const std::vector<std::string>& base) {
     std::string city;
     std::cout << PROMPT_CITY_INPUT;
@@ -52,7 +48,6 @@ bool city_in(const char **used, int &length, const std::vector<std::string>& bas
     }
 }
 
-// проверка правильности названия города
 bool city_name_check(const std::string& city, const char** used, const int length, const std::vector<std::string>& base) {
     const std::string alph = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- ";
     return std::find(base.begin(), base.end(), city) != base.end()
@@ -68,7 +63,6 @@ bool city_name_check(const std::string& city, const std::vector<std::string>& ve
         && std::all_of(city.begin(), city.end(), [&alph](char ch) {return std::find(alph.begin(), alph.end(), ch) != alph.end(); });
 }
 
-// основa
 std::string answer(std::vector<std::string>& used, const std::vector<std::string>& base) {
     if (used.size() == 0)
         throw std::runtime_error(PROMPT_EMPTY_LIST);
@@ -95,28 +89,20 @@ const char* answer(const char** used, int &length, const std::vector<std::string
     throw std::runtime_error(PROMPT_NO_ANSWER);
 }
 
-// find для const char ** 
 bool is_in_array(const char** arr, const int length, const char* str) {
     for (int i = 0; i < length; ++i)
         if (strcmp(arr[i], str) == 0)
             return true;
     return false;
-
 }
 
-// определение последней буквы
 char last_letter(const std::string& city) {
     return last_letter(city.c_str());
 }
 
 char last_letter(const char* city) {
     const std::string forbidden = "hjqwx\0";
-    //std::string_view sv(city);
-    //size_t last = sv.find_last_not_of(forbidden);
-    //return last != sv.npos ? city[last] : '\0';
-
-    for (size_t i = strlen(city) - 1; i >= 0; --i)
-        if (forbidden.find(city[i]) == std::string::npos)
-            return city[i];
-    return '\0';
+    std::string_view sv(city);
+    size_t last = sv.find_last_not_of(forbidden);
+    return last != sv.npos ? city[last] : '\0';
 }
