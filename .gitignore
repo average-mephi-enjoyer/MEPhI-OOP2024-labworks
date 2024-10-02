@@ -1,4 +1,7 @@
 .vs/
 *.json
 1/build
+1/doc
+1/doxycfg
 1/tests
+2/
